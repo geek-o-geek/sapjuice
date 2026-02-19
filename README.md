@@ -82,6 +82,31 @@ You've successfully run and modified your React Native App. :partying_face:
 - If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
 - If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
 
+# Team testing (Android)
+
+**Build a debug APK to share with your team:**
+```bash
+npm run android:apk
+```
+The APK is at `android/app/build/outputs/apk/debug/app-debug.apk`
+
+**Share with testers:**
+- Send the APK via Slack, Google Drive, or email
+- On Android: Settings → Security → enable "Install unknown apps" for their browser/file manager
+- Open the APK file to install
+
+# Admin order notifications
+
+When an order is placed, the app sends the order details to a configurable endpoint so the admin receives an email.
+
+**Setup with Formspree (free):**
+1. Create an account at [formspree.io](https://formspree.io)
+2. Create a new form and copy the form ID
+3. In `src/config.ts`, set `ORDER_NOTIFY_ENDPOINT` to `https://formspree.io/f/YOUR_FORM_ID`
+4. Formspree will email you (the form owner) whenever an order is placed
+
+**Using a custom backend:** Point `ORDER_NOTIFY_ENDPOINT` to your API that accepts POST with order JSON and sends the email.
+
 # Troubleshooting
 
 If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.

@@ -1,0 +1,253 @@
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  Platform,
+  PermissionsAndroid,
+} from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import Geolocation from 'react-native-geolocation-service';
+import { colors, typography, spacing } from '../theme';
+import { reverseGeocode } from '../utils/geocoding';
+
+type MapAddressPickerProps = {
+  onAddressSelect: (address: string, lat: number, lon: number) => void;
+  initialAddress?: string;
+  initialLat?: number;
+  initialLon?: number;
+};
+
+const DEFAULT_REGION = {
+  latitude: 12.9716,
+  longitude: 77.5946,
+  latitudeDelta: 0.02,
+  longitudeDelta: 0.02,
+};
+
+export function MapAddressPicker({
+  onAddressSelect,
+  initialAddress,
+  initialLat,
+  initialLon,
+}: MapAddressPickerProps) {
+  const mapRef = useRef<MapView>(null);
+  const [region, setRegion] = useState(DEFAULT_REGION);
+  const [markerPosition, setMarkerPosition] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(initialLat && initialLon ? { latitude: initialLat, longitude: initialLon } : null);
+  const [address, setAddress] = useState(initialAddress ?? '');
+  const [loading, setLoading] = useState(!initialLat && !initialLon);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchAddress = async (lat: number, lon: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const addr = await reverseGeocode(lat, lon);
+      setAddress(addr);
+      onAddressSelect(addr, lat, lon);
+    } catch (e) {
+      setError('Could not fetch address');
+      setAddress(`${lat.toFixed(4)}, ${lon.toFixed(4)}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const requestLocationAndFetch = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        setError('Location permission is needed to set delivery address.');
+        setLoading(false);
+        return;
+      }
+    } else {
+      const status = await Geolocation.requestAuthorization('whenInUse');
+      if (status !== 'granted') {
+        setError('Location permission is needed to set delivery address.');
+        setLoading(false);
+        return;
+      }
+    }
+    getCurrentLocation();
+  };
+
+  const getCurrentLocation = () => {
+    setLoading(true);
+    setError(null);
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setRegion({
+          ...DEFAULT_REGION,
+          latitude,
+          longitude,
+        });
+        setMarkerPosition({ latitude, longitude });
+        mapRef.current?.animateToRegion({
+          latitude,
+          longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        });
+        fetchAddress(latitude, longitude);
+      },
+      (err) => {
+        setError('Could not get location. Tap the map to set manually.');
+        setLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  };
+
+  useEffect(() => {
+    if (!initialLat || !initialLon) {
+      requestLocationAndFetch();
+    } else {
+      setRegion({
+        ...DEFAULT_REGION,
+        latitude: initialLat,
+        longitude: initialLon,
+      });
+      setLoading(false);
+    }
+  }, []);
+
+  const handleMapPress = (e: { nativeEvent: { coordinate: { latitude: number; longitude: number } } }) => {
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    setMarkerPosition({ latitude, longitude });
+    fetchAddress(latitude, longitude);
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.mapContainer}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          region={region}
+          onRegionChangeComplete={setRegion}
+          onPress={handleMapPress}
+          showsUserLocation
+          showsMyLocationButton={false}
+        >
+          {markerPosition && (
+            <Marker
+              coordinate={markerPosition}
+              draggable
+              onDragEnd={(e) => {
+                const { latitude, longitude } = e.nativeEvent.coordinate;
+                setMarkerPosition({ latitude, longitude });
+                fetchAddress(latitude, longitude);
+              }}
+            />
+          )}
+        </MapView>
+        <TouchableOpacity
+          style={styles.myLocationButton}
+          onPress={requestLocationAndFetch}
+          disabled={loading}
+        >
+          <Text style={styles.myLocationIcon}>📍</Text>
+        </TouchableOpacity>
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="small" color={colors.primary} />
+          </View>
+        )}
+      </View>
+
+      {error && (
+        <Text style={styles.error}>{error}</Text>
+      )}
+
+      {address ? (
+        <View style={styles.addressBox}>
+          <Text style={styles.addressLabel}>Delivery address</Text>
+          <Text style={styles.addressText}>{address}</Text>
+        </View>
+      ) : (
+        <Text style={styles.hint}>Tap the map or use the button to set your location</Text>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: spacing.lg,
+  },
+  mapContainer: {
+    height: 220,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: colors.borderLight,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+  myLocationButton: {
+    position: 'absolute',
+    bottom: spacing.base,
+    right: spacing.base,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: { elevation: 4 },
+    }),
+  },
+  myLocationIcon: {
+    fontSize: 22,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  error: {
+    ...typography.caption,
+    color: colors.error,
+    marginTop: spacing.sm,
+  },
+  addressBox: {
+    marginTop: spacing.base,
+    padding: spacing.base,
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  addressLabel: {
+    ...typography.label,
+    color: colors.textMuted,
+    marginBottom: spacing.xs,
+  },
+  addressText: {
+    ...typography.body,
+    color: colors.text,
+  },
+  hint: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+  },
+});
