@@ -7,24 +7,23 @@ const fontFamily = Platform.select({
 });
 
 export const typography = {
-  // Headings
   h1: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700' as const,
-    lineHeight: 34,
-    letterSpacing: -0.5,
+    lineHeight: 40,
+    letterSpacing: -0.6,
   },
   h2: {
-    fontSize: 22,
-    fontWeight: '600' as const,
-    lineHeight: 28,
+    fontSize: 26,
+    fontWeight: '700' as const,
+    lineHeight: 32,
+    letterSpacing: -0.3,
   },
   h3: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600' as const,
-    lineHeight: 24,
+    lineHeight: 26,
   },
-  // Body
   body: {
     fontSize: 16,
     fontWeight: '400' as const,
@@ -35,11 +34,11 @@ export const typography = {
     fontWeight: '600' as const,
     lineHeight: 24,
   },
-  // Labels & small
   label: {
     fontSize: 14,
     fontWeight: '500' as const,
     lineHeight: 20,
+    letterSpacing: 0.1,
   },
   caption: {
     fontSize: 12,
@@ -50,11 +49,12 @@ export const typography = {
     fontSize: 12,
     fontWeight: '600' as const,
     lineHeight: 16,
+    letterSpacing: 0.2,
   },
-  // Button
   button: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600' as const,
     lineHeight: 24,
+    letterSpacing: 0.2,
   },
 };

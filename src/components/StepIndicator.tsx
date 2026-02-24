@@ -16,8 +16,9 @@ export function StepIndicator({
   return (
     <View style={styles.container}>
       {Array.from({ length: totalSteps }, (_, i) => {
-        const isActive = i + 1 === currentStep;
-        const isComplete = i + 1 < currentStep;
+        const step = i + 1;
+        const isActive = step === currentStep;
+        const isComplete = step < currentStep;
         return (
           <React.Fragment key={i}>
             <View style={styles.stepWrapper}>
@@ -34,10 +35,10 @@ export function StepIndicator({
                   <Text
                     style={[
                       styles.stepNumber,
-                      isActive && styles.stepNumberActive,
+                      (isActive || isComplete) && styles.stepNumberActive,
                     ]}
                   >
-                    {i + 1}
+                    {step}
                   </Text>
                 )}
               </View>
@@ -79,35 +80,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dot: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.border,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.borderLight,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.border,
   },
   dotActive: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   dotComplete: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   stepNumber: {
     ...typography.captionBold,
+    fontSize: 13,
     color: colors.textMuted,
   },
   stepNumberActive: {
-    color: colors.surface,
+    color: '#FFFFFF',
   },
   check: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
-    color: colors.surface,
+    color: '#FFFFFF',
   },
   label: {
     ...typography.caption,
     color: colors.textMuted,
-    marginTop: spacing.sm,
+    marginTop: 6,
     maxWidth: 72,
   },
   labelActive: {
@@ -116,13 +122,15 @@ const styles = StyleSheet.create({
   },
   labelComplete: {
     color: colors.textSecondary,
+    fontWeight: '500',
   },
   connector: {
     flex: 1,
-    maxWidth: 32,
-    height: 2,
+    maxWidth: 36,
+    height: 2.5,
     backgroundColor: colors.border,
     marginHorizontal: 2,
+    borderRadius: 2,
   },
   connectorComplete: {
     backgroundColor: colors.primary,

@@ -1,21 +1,24 @@
 export const colors = {
-  // Primary - refined forest green
-  primary: '#0D9488',
-  primaryLight: '#5EEAD4',
-  primaryDark: '#0F766E',
+  // Brand - vibrant teal with richer depth
+  primary: '#0EAF9B',
+  primaryLight: '#67E8D8',
+  primaryDark: '#0B6F67',
+  secondary: '#F97360',
+  secondarySoft: '#FFE7E2',
   // Neutrals
-  background: '#FAFAF9',
+  background: '#F6FBFA',
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
-  text: '#171717',
-  textSecondary: '#737373',
-  textMuted: '#A3A3A3',
-  border: '#E7E5E4',
-  borderLight: '#F5F5F4',
+  text: '#0F172A',
+  textSecondary: '#475569',
+  textMuted: '#94A3B8',
+  border: '#DDE8E5',
+  borderLight: '#ECF3F1',
   // Semantic
-  success: '#059669',
+  success: '#16A34A',
   error: '#DC2626',
+  warning: '#F59E0B',
   // Accent for selections/highlights
-  accent: '#CCFBF1',
-  accentMuted: '#F0FDFA',
+  accent: '#DDFBF4',
+  accentMuted: '#F2FFFB',
 };

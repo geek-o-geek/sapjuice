@@ -1,5 +1,5 @@
 export type RootStackParamList = {
-  Register: undefined;
+  Register: { mode?: 'signIn' } | undefined;
   SelectJuice: {
     name: string;
     email: string;
@@ -13,5 +13,12 @@ export type RootStackParamList = {
   };
   Feedback: {
     orderId: string;
+    orderedJuices?: { id: string; name: string }[];
+    pointsEarned?: number;
+    pointsUsed?: number;
   };
+  OrderTracking: {
+    orderId: string;
+  };
+  Reviews: undefined;
 };

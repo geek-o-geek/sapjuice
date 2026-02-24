@@ -40,7 +40,7 @@ export function Button({
       ]}
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
     >
       {loading ? (
         <ActivityIndicator
@@ -57,19 +57,20 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    paddingVertical: spacing.base,
+    paddingVertical: 16,
     paddingHorizontal: spacing.lg,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 52,
-    ...shadows.sm,
+    minHeight: 56,
   },
   primary: {
     backgroundColor: colors.primary,
+    ...shadows.md,
   },
   secondary: {
-    backgroundColor: colors.accentMuted,
+    backgroundColor: colors.accent,
+    ...shadows.sm,
   },
   outline: {
     backgroundColor: 'transparent',
@@ -77,13 +78,13 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.45,
   },
   text: {
     ...typography.button,
   },
   primaryText: {
-    color: colors.surface,
+    color: '#FFFFFF',
   },
   secondaryText: {
     color: colors.primaryDark,
